@@ -231,20 +231,18 @@ function getAllServices() {
     return $services;
 }
 
-// Function to get all staff members
-function getAllStaff() {
-    $conn = getDbConnection();
-    $result = $conn->query("SELECT * FROM staff ORDER BY last_name");
-    
-    $staff = [];
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $staff[] = $row;
-        }
+// Function to get the enabled payment methods (used by payment.php and pay_dues.php)
+function getEnabledPaymentMethods() {
+  $conn = getDbConnection();
+  $result = $conn->query("SELECT * FROM accepted_payment_methods WHERE is_enabled = 1 ORDER BY method_name");
+  $methods = [];
+  if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+      $methods[] = $row;
     }
-    
-    $conn->close();
-    return $staff;
+  }
+  $conn->close();
+  return $methods;
 }
 
 // User authentication functions

@@ -2,20 +2,6 @@
 require_once '../reusable/db_setup.php';
 session_start();
 
-// Get enabled payment methods
-function getEnabledPaymentMethods() {
-  $conn = getDbConnection();
-  $result = $conn->query("SELECT * FROM accepted_payment_methods WHERE is_enabled = 1 ORDER BY method_name");
-  $methods = [];
-  if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-      $methods[] = $row;
-    }
-  }
-  $conn->close();
-  return $methods;
-}
-
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login/login.php");

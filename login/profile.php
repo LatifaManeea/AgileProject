@@ -357,6 +357,22 @@ $payments = getUserPayments($user_id);
                     <?php echo $refundMessage; ?>
 
                     <?php if (count($appointments) > 0): ?>
+                        <!-- Filter bar: handled by assets/js/profile.js -->
+                        <div class="row g-2 mb-3" id="appointmentFilterBar">
+                            <div class="col-md-4">
+                                <label for="statusFilter" class="form-label visually-hidden">Filter by status</label>
+                                <select class="form-select" id="statusFilter">
+                                    <option value="all">All statuses</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <label for="serviceSearch" class="form-label visually-hidden">Search by service name</label>
+                                <input type="search" class="form-control" id="serviceSearch" placeholder="Search by service name">
+                            </div>
+                        </div>
                         <div class="row">
                             <?php foreach ($appointments as $appointment): ?>
                                 <?php
@@ -376,7 +392,9 @@ $payments = getUserPayments($user_id);
                                         break;
                                 }
                                 ?>
-                                <div class="col-lg-6 mb-3">
+                                <div class="col-lg-6 mb-3 appointment-item"
+                                     data-status="<?php echo htmlspecialchars($appointment['status']); ?>"
+                                     data-service="<?php echo htmlspecialchars(strtolower($appointment['service_name'])); ?>">
                                     <div class="card appointment-card <?php echo $statusClass; ?>">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start mb-3">
@@ -524,6 +542,9 @@ $payments = getUserPayments($user_id);
                                 </div>
                             <?php endforeach; ?>
                         </div>
+                        <p class="text-muted text-center d-none" id="noAppointmentMatch">
+                            No appointments match your filter.
+                        </p>
                     <?php else: ?>
                         <div class="text-center py-5">
                             <i class="far fa-calendar-times display-1 text-muted mb-4"></i>

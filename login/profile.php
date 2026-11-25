@@ -112,33 +112,39 @@ if (isset($_POST['change_password'])) {
 if (isset($_POST['update_appointment'])) {
     require_once __DIR__ . '/../reusable/notifications_service.php';
     $appointment_id = (int)$_POST['appointment_id'];
-    $status = $_POST['status'];
+    $status = $_POST['status'] ?? '';
 
     $conn = getDbConnection();
-    // Fetch original status to detect change
-    $origStmt = $conn->prepare("SELECT status FROM appointments WHERE id = ? AND user_id = ?");
+    // Fetch the appointment (it must belong to this user) to validate the change
+    $origStmt = $conn->prepare("SELECT status, appointment_date, appointment_time FROM appointments WHERE id = ? AND user_id = ?");
     $origStmt->bind_param("ii", $appointment_id, $user_id);
     $origStmt->execute();
     $orig = $origStmt->get_result()->fetch_assoc();
     $origStmt->close();
 
-    $stmt = $conn->prepare("UPDATE appointments SET status = ? WHERE id = ? AND user_id = ?");
-    $stmt->bind_param("sii", $status, $appointment_id, $user_id);
-
-    if ($stmt->execute()) {
-        $appointmentMessage = '<div class="alert alert-success">Appointment status updated successfully</div>';
-        if ($orig && $orig['status'] !== $status) {
-            if ($status === 'cancelled') {
-                notifyAppointmentCancelled($appointment_id);
-            } else {
-                notifyAppointmentModified($appointment_id);
-            }
-        }
+    if (!$orig) {
+        $appointmentMessage = '<div class="alert alert-danger">Appointment not found</div>';
+    } elseif ($orig['status'] === $status) {
+        $appointmentMessage = '<div class="alert alert-info">No change was made to the appointment</div>';
+    } elseif ($orig['status'] !== 'confirmed' || $status !== 'cancelled') {
+        // Users may only cancel a confirmed appointment; they cannot re-confirm,
+        // complete or set any other status (this would also bypass refunds).
+        $appointmentMessage = '<div class="alert alert-danger">Only a confirmed appointment can be cancelled. Cancelled or completed appointments cannot be changed</div>';
+    } elseif (strtotime($orig['appointment_date'] . ' ' . $orig['appointment_time']) <= time()) {
+        $appointmentMessage = '<div class="alert alert-danger">Past appointments cannot be changed</div>';
     } else {
-        $appointmentMessage = '<div class="alert alert-danger">Error updating appointment: ' . $conn->error . '</div>';
+        $stmt = $conn->prepare("UPDATE appointments SET status = 'cancelled' WHERE id = ? AND user_id = ? AND status = 'confirmed'");
+        $stmt->bind_param("ii", $appointment_id, $user_id);
+
+        if ($stmt->execute()) {
+            $appointmentMessage = '<div class="alert alert-success">Appointment cancelled successfully</div>';
+            notifyAppointmentCancelled($appointment_id);
+        } else {
+            $appointmentMessage = '<div class="alert alert-danger">Error updating appointment: ' . $conn->error . '</div>';
+        }
+        $stmt->close();
     }
 
-    $stmt->close();
     $conn->close();
 }
 

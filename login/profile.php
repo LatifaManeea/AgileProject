@@ -407,8 +407,8 @@ $payments = getUserPayments($user_id);
                                             </div>
 
                                             <?php if (
-                                                $appointment['status'] !== 'completed' &&
-                                                strtotime($appointment['appointment_date']) >= strtotime(date('Y-m-d'))
+                                                $appointment['status'] === 'confirmed' &&
+                                                strtotime($appointment['appointment_date'] . ' ' . $appointment['appointment_time']) > time()
                                             ): ?>
                                                 <button type="button" class="btn btn-sm btn-outline-secondary"
                                                     data-bs-toggle="modal"

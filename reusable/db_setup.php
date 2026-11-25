@@ -245,22 +245,6 @@ function getEnabledPaymentMethods() {
   return $methods;
 }
 
-// Function to get all staff members
-function getAllStaff() {
-    $conn = getDbConnection();
-    $result = $conn->query("SELECT * FROM staff ORDER BY last_name");
-    
-    $staff = [];
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $staff[] = $row;
-        }
-    }
-    
-    $conn->close();
-    return $staff;
-}
-
 // User authentication functions
 function authenticateUser($username, $password) {
     $conn = getDbConnection();

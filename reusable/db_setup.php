@@ -1,16 +1,24 @@
 <?php
-$db_host = 'localhost';
-$db_port = '8889';
-$db_name = 'WebProject';
-$db_user = 'root';
-$db_pass = 'root';
+// Connection settings (host, port, database name, user, password) live in config.php
+require_once __DIR__ . '/config.php';
 
-// Create connection
-$conn = new mysqli($db_host, $db_user, $db_pass, $db_name, $db_port);
+// The database name is used inside an SQL identifier, so only allow safe characters
+if (!preg_match('/^[A-Za-z0-9_]+$/', $db_name)) {
+    die("Invalid database name in configuration");
+}
+
+// Connect to the server first, so the database can be created if it is missing
+$conn = new mysqli($db_host, $db_user, $db_pass, '', (int)$db_port);
 
 // Check connection first before any queries
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
+}
+
+// Create the database on first run (no manual setup step needed in a new environment)
+$conn->query("CREATE DATABASE IF NOT EXISTS `$db_name` CHARACTER SET utf8mb4");
+if (!$conn->select_db($db_name)) {
+    die("Could not use database '$db_name': " . $conn->error);
 }
 
 // Track whether the services table existed BEFORE creation to decide on seeding

@@ -9,14 +9,14 @@ A PHP/MySQL web application for a beauty salon. Customers can browse services, b
 ## Requirements
 - PHP 8 with the `mysqli` extension
 - MySQL or MariaDB (the project was built with MAMP: MySQL on port **8889**, user `root`, password `root`)
+- The MySQL user must be allowed to create the database, or the database must already exist
 - A modern web browser (Bootstrap 5 and Font Awesome are loaded from a CDN, so an internet connection is needed for styling)
 
 ## Setup
 1. Start MySQL.
-2. Create an empty database named `WebProject`.
-3. Check the connection settings at the top of `reusable/db_setup.php` (`$db_host`, `$db_port`, `$db_name`, `$db_user`, `$db_pass`) and change them to match your MySQL.
-4. Serve the project folder as the web root (links use paths starting with `/`). Either set the MAMP document root to the project folder, or run from the project folder: `php -S localhost:8000`
-5. Open `http://localhost:8000/index.php`. On the first request the tables are created and filled with sample services, three payment methods and a default admin account.
+2. Check the connection settings in `reusable/config.php`. The defaults match MAMP (host `localhost`, port `8889`, database `WebProject`, user `root`, password `root`). To use other settings without editing code, set the environment variables `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` and `DB_PASS` (use `DB_HOST=127.0.0.1` to force a TCP connection to the given port).
+3. Serve the project folder as the web root (links use paths starting with `/`). Either set the MAMP document root to the project folder, or run from the project folder: `php -S localhost:8000`
+4. Open `http://localhost:8000/index.php`. On the first request the database is created if it does not exist, then the tables are created and filled with sample services, three payment methods and a default admin account.
 
 Default admin login: **admin / admin123** (change it after the first login).
 

@@ -1,9 +1,6 @@
 <?php
-$db_host = 'localhost';
-$db_port = '8889';
-$db_name = 'WebProject';
-$db_user = 'root';
-$db_pass = 'root';
+// Connection settings (host, port, database name, user, password) live in config.php
+require_once __DIR__ . '/config.php';
 
 // Create connection
 $conn = new mysqli($db_host, $db_user, $db_pass, $db_name, $db_port);
